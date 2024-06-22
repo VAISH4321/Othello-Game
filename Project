@@ -1,0 +1,374 @@
+import tkinter as tk
+from PIL import Image, ImageTk
+import pygame
+
+pygame.mixer.init()
+def open_menu():
+    # Create a new window for the game menu
+    menu_window = tk.Toplevel(root)
+    menu_window.title("Main Menu")
+    menu_window.geometry("1366x768")
+    # Load and resize the background image for the menu window
+    # Create a canvas and add the back
+    menu_background_image_path = "p.jpg"
+    menu_background_image = Image.open(menu_background_image_path)
+    menu_background_image = menu_background_image.resize((1366, 768), Image.Resampling.LANCZOS)
+    menu_background_photo = ImageTk.PhotoImage(menu_background_image)
+    menu_canvas = tk.Canvas(menu_window, width=1366, height=768)
+    menu_canvas.pack(fill="both", expand=True)
+    menu_canvas.create_image(0, 0, image=menu_background_photo, anchor="nw")
+
+    # Add a menu title
+    menu_canvas.create_text(683, 450, text="Game Menu", font=("Helvetica", 24, "bold"), fill="black")
+    #menu_title = tk.Label(menu_window, text="Game Menu", font=("Helvetica", 18, "bold"), bg="white")
+    # Create menu buttons
+    new_game_button = tk.Button(menu_window, text="New Game", font=("Helvetica", 18), command=difficulty_level)
+    load_game_button = tk.Button(menu_window, text="Load Game", font=("Helvetica", 18), command=difficulty_level)
+    exit_button = tk.Button(menu_window, text="Exit", font=("Helvetica", 18), command=menu_window.destroy)
+
+    # Create level selection buttons
+    #menu_canvas.create_text(683, 230, text="Game Menu", font=("Helvetica", 24, "bold"), fill="blue")
+    #level_title = tk.Label(menu_window, text="Select Difficulty Level", font=("Helvetica", 18, "bold"), bg="white")
+    #easy_button = tk.Button(menu_window, text="Easy", font=("Helvetica", 18), command=open_othello_board)
+    #medium_button = tk.Button(menu_window, text="Medium", font=("Helvetica", 18), command=open_othello_board)
+    #hard_button = tk.Button(menu_window, text="Hard", font=("Helvetica", 18), command=open_othello_board)
+
+    # Add the buttons to the canvas
+    menu_canvas.create_window(683, 500, window=new_game_button)
+    menu_canvas.create_window(683, 550, window=load_game_button)
+    menu_canvas.create_window(683, 600, window=exit_button)
+    #menu_canvas.create_window(683, 350, window=level_title)
+    #menu_canvas.create_window(683, 400, window=easy_button)
+    #menu_canvas.create_window(683, 450, window=medium_button)
+    #menu_canvas.create_window(683, 500, window=hard_button)
+
+    # Keep a reference to the image to prevent garbage collection   
+    menu_window.menu_background_photo = menu_background_photo
+def difficulty_level():
+    level_window = tk.Toplevel(root)
+    level_window.title("Game Settings")
+    level_window.geometry("1366x768")
+    #level_window.configure("green")
+    menu_background_image_path ="p.jpg"
+    menu_background_image = Image.open(menu_background_image_path)
+    menu_background_image = menu_background_image.resize((1366, 768), Image.Resampling.LANCZOS)
+    menu_background_photo = ImageTk.PhotoImage(menu_background_image)
+
+    menu_canvas = tk.Canvas(level_window, width=1366, height=768)
+    menu_canvas.pack(fill="both", expand=True)
+    menu_canvas.create_image(0, 0, image=menu_background_photo, anchor="nw")
+
+    #menu_canvas.create_text(683, 430, text="Game Menu", font=("Helvetica", 24, "bold"), fill="black")
+
+    level_title = tk.Label(level_window, text="Select Difficulty Level", font=("Helvetica", 18, "bold"), bg="white")
+    easy_button = tk.Button(level_window, text="Easy", font=("Helvetica", 18), command=open_othello_board)
+    medium_button = tk.Button(level_window, text="Medium", font=("Helvetica", 18), command=open_othello_board)
+    hard_button = tk.Button(level_window, text="Hard", font=("Helvetica", 18), command=open_othello_board)
+    exit_button=tk.Button(level_window,text="Exit",font=("Helvetica",18),command=level_window.destroy)
+    menu_canvas.create_window(683, 480, window=level_title)
+    menu_canvas.create_window(550, 550, window=easy_button)
+    menu_canvas.create_window(683, 550, window=medium_button)
+    menu_canvas.create_window(820, 550, window=hard_button)
+    menu_canvas.create_window(683,610,window=exit_button)
+
+    level_window.menu_background_photo = menu_background_photo
+
+def new_game():
+    print("New Game started!")
+
+def load_game():
+    print("Load Game clicked!")
+
+def settings():
+    print("Settings clicked!")
+
+def select_level(level):
+    print(f"{level} level selected!")
+
+def open_othello_board():
+    global current_player, board_state, canvas, cell_size, highlights,score_label,turn_label
+    current_player = "black"  # Start with black
+    board_state = [[None for _ in range(8)] for _ in range(8)]  # Initialize board state
+    #pygame.mixer.music.load("music.mp3")
+    #pygame.mixer.music.play(-1)  
+
+    # Create a new window for the Othello game
+    othello_window = tk.Toplevel(root)
+    othello_window.title("Othello Game")
+    othello_window.geometry("1366x768")
+    #othello_window.configure("black")
+    exit_button = tk.Button(othello_window, text="Exit", font=("Helvetica", 18), command=othello_window.destroy)
+    exit_button.pack()
+    score_label = tk.Label(othello_window, text="", font=("Helvetica", 16))
+    score_label.pack()
+    turn_label = tk.Label(othello_window, text=f"Turn: {current_player.capitalize()}", font=("Helvetica", 16))
+    turn_label.pack()
+    # Create a canvas for the game board
+    canvas = tk.Canvas(othello_window, width=600, height=600, bg="green")
+    canvas.pack()
+
+    # Draw the grid for the Othello board (8x8)
+    board_size = 8
+    cell_size = 600 // board_size
+    for i in range(board_size + 1):
+        canvas.create_line(i * cell_size, 0, i * cell_size, 600, fill="black")
+        canvas.create_line(0, i * cell_size, 600, i * cell_size, fill="black")
+
+    # Initial positions of the coins
+    initial_positions = [
+        (3, 3, "white"), (4, 4, "white"),
+        (3, 4, "black"), (4, 3, "black")
+    ]
+    for x, y, color in initial_positions:
+        draw_coin(canvas, x, y, color, cell_size)
+        board_state[x][y] = color
+
+    # Bind click event to the canvas
+    canvas.bind("<Button-1>", place_coin)
+
+    # Highlight legal moves for the initial player
+    highlights = []
+    highlight_legal_moves()
+    update_score()
+
+def draw_coin(canvas, x, y, color, cell_size):
+    margin = cell_size // 8
+    x0 = x * cell_size + margin
+    y0 = y * cell_size + margin
+    x1 = (x + 1) * cell_size - margin
+    y1 = (y + 1) * cell_size - margin
+    canvas.create_oval(x0, y0, x1, y1, fill=color, outline="black")
+
+def has_valid_moves(player):
+    for x in range(8):
+        for y in range(8):
+            if is_valid_move(x, y, player):
+                return True
+    return False
+
+def check_game_end():
+    if not has_valid_moves("black") and not has_valid_moves("white"):
+        black_score = sum(row.count("black") for row in board_state)
+        white_score = sum(row.count("white") for row in board_state)
+        if black_score > white_score:
+            winner = "Black"
+        elif white_score > black_score:
+            winner = "White"
+        else:
+            winner = "No one. It's a tie!"
+        canvas.create_text(300, 300, text=f"Game Over! Winner: {winner}", font=("Helvetica", 40), fill="white")
+
+def place_coin(event):
+    global current_player, board_state, cell_size, highlights
+    x = event.x // cell_size
+    y = event.y // cell_size
+
+    if is_valid_move(x, y, current_player):
+        draw_coin(canvas, x, y, current_player, cell_size)
+        board_state[x][y] = current_player
+        flip_coins(x, y, current_player)
+
+        current_player = "white" if current_player == "black" else "black"
+        turn_label.config(text=f"Turn: {current_player.capitalize()}")
+
+        clear_highlights()
+        highlight_legal_moves()
+        update_score()
+        check_game_end()
+    else:
+        # Check if the current player has no valid moves and switch turn if necessary
+        if not has_valid_moves(current_player):
+            current_player = "white" if current_player == "black" else "black"
+            turn_label.config(text=f"Turn: {current_player.capitalize()}")
+
+            clear_highlights()
+            highlight_legal_moves()
+
+
+def is_valid_move(x, y, player):
+    if board_state[x][y] is not None:
+        return False
+
+    opponent = "white" if player == "black" else "black"
+    directions = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+    for dx, dy in directions:
+        if check_direction(x, y, dx, dy, player, opponent):
+            return True
+    return False
+
+def check_direction(x, y, dx, dy, player, opponent):
+    nx, ny = x + dx, y + dy
+    if not (0 <= nx < 8 and 0 <= ny < 8) or board_state[nx][ny] != opponent:
+        return False
+
+    nx += dx
+    ny += dy
+    while 0 <= nx < 8 and 0 <= ny < 8:
+        if board_state[nx][ny] == player:
+            return True
+        if board_state[nx][ny] is None:
+            return False
+        nx += dx
+        ny += dy
+    return False
+
+def flip_coins(x, y, player):
+    opponent = "white" if player == "black" else "black"
+    directions = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+    for dx, dy in directions:
+        if check_direction(x, y, dx, dy, player, opponent):
+            flip_in_direction(x, y, dx, dy, player, opponent)
+
+def flip_in_direction(x, y, dx, dy, player, opponent):
+    nx, ny = x + dx, y + dy
+    while board_state[nx][ny] == opponent:
+        board_state[nx][ny] = player
+        draw_coin(canvas, nx, ny, player, cell_size)
+        nx += dx
+        ny += dy
+
+def highlight_legal_moves():
+    global highlights
+    for x in range(8):
+        for y in range(8):
+            if is_valid_move(x, y, current_player):
+                highlight = canvas.create_oval(x * cell_size + cell_size // 4,
+                                               y * cell_size + cell_size // 4,
+                                               (x + 1) * cell_size - cell_size // 4,
+                                               (y + 1) * cell_size - cell_size // 4,
+                                               outline="yellow", width=2)
+                highlights.append(highlight)
+
+def clear_highlights():
+    global highlights
+    for highlight in highlights:
+        canvas.delete(highlight)
+    highlights.clear()
+def update_score():
+    black_score = sum(row.count("black") for row in board_state)
+    white_score = sum(row.count("white") for row in board_state)
+    score_label.config(text=f"Black: {black_score}  White: {white_score}")
+
+def check_game_end():
+    if all(cell is not None for row in board_state for cell in row):
+        black_score = sum(row.count("black") for row in board_state)
+        white_score = sum(row.count("white") for row in board_state)
+        if black_score > white_score:
+            winner = "Black"
+        elif white_score > black_score:
+            winner = "White"
+        else:
+            winner = "No one. It's a tie!"
+        show_winner(winner)
+        #canvas.create_text(300, 300, text=f"Game Over! Winner: {winner}", font=("Helvetica", 24), fill="red")
+def show_winner(winner):
+    winner_window = tk.Toplevel()
+    winner_window.title("Game Over")
+    winner_window.geometry("800x600")
+
+    canvas = tk.Canvas(winner_window, width=800, height=600)
+    canvas.pack()
+    canvas.create_text(300,280,text="Congratulations...!",font=("Helvetica",50))
+    canvas.create_text(300,400,text=f"Winner is {winner}...Ureey..! Lets Celebrate",font=("Helvetica",24),fill="black")
+    # Function to update the video frames
+    canvas.create_text(300,520,text="Game Over!",font=("Helvetica",50),fill="black")
+    #canvas.create_text(300, 300, text=f"Game Over! Winner: {winner}", font=("Helvetica", 24), fill="red")
+def play_music():
+    pygame.mixer.music.load("music.mp3")  # Replace with your music file
+    pygame.mixer.music.play(-1)  # Play the music indefinitely
+
+def stop_music():
+    pygame.mixer.music.stop()
+
+def on_enter(e):
+    e.widget['background'] = 'lightblue'
+
+def on_leave(e):
+    e.widget['background'] = 'SystemButtonFace'
+def show_instructions():
+    instructions_window=tk.Toplevel(root)
+    instructions_window.title("How to Play")
+    instructions_window.geometry("1366x768")
+    instructions_label=tk.Label(instructions_window,text="How to Play",font=('Helvetica',50,'bold'))
+    instructions_label.pack(pady=10)
+    instructions_text="""To play Othello, the game starts with four discs placed in the center of the board in a specific pattern: two white discs and two black discs diagonally.
+Players take turns placing one disc at a time on the board. 
+Here are the main rules:
+1. You must place your disc so that it surrounds at least one of your opponent's discs in a straight line (horizontally, vertically, or diagonally).
+2. When you place a disc, you must trap at least one of your opponent's discs between your newly placed disc and any of your previously placed discs.
+3. The trapped discs are then flipped to your color.
+4. If you can't make a legal move, you pass your turn.
+5. The game ends when no player can make a legal move. The player with the most discs of their color on the board wins."""
+    instructions_content=tk.Label(instructions_window,text=instructions_text,font=('Helvetica',15),justify=tk.LEFT,padx=20,pady=20)
+    instructions_content.pack()
+# Initialize the main window
+root = tk.Tk()
+root.title("The Othello")
+
+# Set the window size
+window_width = 1366
+window_height = 768
+root.geometry(f"{window_width}x{window_height}")
+
+# Load and resize the background image
+background_image_path = "p.jpg"
+background_image = Image.open(background_image_path)
+background_image = background_image.resize((window_width, window_height), Image.Resampling.LANCZOS)
+background_photo = ImageTk.PhotoImage(background_image)
+
+# Create a canvas and add the background image
+canvas = tk.Canvas(root, width=window_width, height=window_height)
+canvas.pack(fill="both", expand=True)
+canvas.create_image(0, 0, image=background_photo, anchor="nw")
+
+# Add the main game title
+#title_text = "The Othello"
+#title_font = ("Helvetica", 120, "bold")
+#level_title = tk.Label(root, text="The Othello", font=("Helvetica",100, "bold"), bg="white")
+#canvas.create_text(window_width // 2,window_height // 4+140, text=title_text, font=title_font, fill="black")
+#canvas.create_window(683, 250, window=level_title)
+#tk.Label(root, text="The Othello", font=("Helvetica", 18, "bold"), bg="white")
+# Add a subtitle below the main titlet_button.bind("<Leave>", on_leave)
+
+#subtitle_text = "~ A Minute to Learn... A Lifetime to Master"
+#subtitle_font = ("Helvetica", 20,"bold")
+#sublevel_title=tk.Label(root,text=subtitle_text,font=subtitle_font,bg="white")
+#canvas.create_window(683,350,window=sublevel_title)
+#canvas.create_text(window_width // 2, window_height // 4 + 210, text=subtitle_text, font=subtitle_font, fill="black")
+button_style = {
+    "font": ("Helvetica", 24, "bold"),
+    "fg": "white",
+    "bg": "#3498db",
+    "activeforeground": "white",
+    "activebackground": "#2980b9",
+    "borderwidth": 0,
+    "highlightthickness": 0,
+    "padx": 20,
+    "pady": 10,
+}
+# Create the start button
+start_button = tk.Button(root, text="Start Game ▶", command=open_menu, font=("Helvetica", 30))
+start_button_window = canvas.create_window(window_width // 2, window_height // 2+100, window=start_button)
+start_button.bind("<Enter>", on_enter)
+start_button.bind("<Leave>", on_leave)
+# Create a button to stop music
+play_button = tk.Button(root, text="Play Music 🔊", command=play_music, font=("Helvetica", 14))
+play_button_window = canvas.create_window(window_width // 2-150, window_height // 2+190, window=play_button)
+play_button.bind("<Enter>", on_enter)
+play_button.bind("<Leave>", on_leave)
+
+# Create a button to stop music
+stop_button = tk.Button(root, text="Stop Music ♫⃠", command=stop_music, font=("Helvetica", 14))
+stop_button_window = canvas.create_window(window_width // 2+10, window_height // 2+190, window=stop_button)
+stop_button.bind("<Enter>", on_enter)
+stop_button.bind("<Leave>", on_leave)
+
+# Create a button to exit
+exit_button = tk.Button(root, text="Quit🔚", command=root.destroy, font=("Helvetica", 14))
+exit_button_window = canvas.create_window(window_width // 2+150, window_height // 2+190, window=exit_button)
+exit_button.bind("<Enter>", on_enter)
+exit_button.bind("<Leave>", on_leave)
+
+how_to_play_button=tk.Button(root,text="How to Play❔",command=show_instructions,font=("Helvetica",14))
+button_window = canvas.create_window(window_width // 2+10, window_height // 2+240, window=how_to_play_button)
+root.mainloop()
